@@ -1,17 +1,17 @@
 <template>
   <main>
     <div class="container">
-      <Calculator />
+      <CurrencyCalculator />
     </div>
   </main>
 </template>
 
 <script setup>
-import Calculator from './components/Calculator.vue';
+import CurrencyCalculator from "./components/CurrencyCalculator.vue";
 </script>
 
 <style>
-@import 'assets/styles/base.scss';
+@import "assets/styles/base.scss";
 
 .container {
   padding: 2rem;

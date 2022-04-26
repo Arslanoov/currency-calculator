@@ -9,7 +9,11 @@
     <template #option="option">
       <div class="select__row">
         <div class="select__left">
-          <img class="select__image" :src="`/icons/${option.label}.png`" alt="" />
+          <img
+            class="select__image"
+            :src="`/icons/${option.label}.png`"
+            alt=""
+          />
         </div>
         <div class="select__title">{{ option.label.toUpperCase() }}</div>
       </div>
@@ -18,18 +22,18 @@
 </template>
 
 <script setup>
-import { CURRENCIES_LIST } from '~/const/currency';
+import { CURRENCIES_LIST } from "~/const/currency";
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(["change"]);
 
 defineProps({
   value: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
-const onCurrencyChange = (name) => emit('change', name);
+const onCurrencyChange = (name) => emit("change", name);
 </script>
 
 <style lang="scss" scoped>

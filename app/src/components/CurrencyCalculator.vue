@@ -5,17 +5,18 @@
 
       <div class="calculator-form__row">
         <CurrencySelect
-          @change="name => onCurrencyChange(TYPE_FIRST, name, valueFirst)"
+          @change="(name) => onCurrencyChange(TYPE_FIRST, name, valueFirst)"
           :value="currencyFirst"
         />
         <input
           @input="onChange(TYPE_FIRST, $event.target.value)"
-          :value="valueFirst" name="from"
+          :value="valueFirst"
+          name="from"
           class="calculator-form__input"
           id="from"
           type="number"
           min="0"
-        >
+        />
       </div>
     </div>
 
@@ -24,7 +25,7 @@
 
       <div class="calculator-form__row">
         <CurrencySelect
-          @change="name => onCurrencyChange(TYPE_SECOND, name, valueSecond)"
+          @change="(name) => onCurrencyChange(TYPE_SECOND, name, valueSecond)"
           :value="currencySecond"
         />
         <input
@@ -34,7 +35,7 @@
           class="calculator-form__input"
           type="number"
           min="0"
-        >
+        />
       </div>
     </div>
 
@@ -43,13 +44,13 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-import { createToaster } from '@meforma/vue-toaster';
+import { computed } from "vue";
+import { useStore } from "vuex";
+import { createToaster } from "@meforma/vue-toaster";
 
-import { TYPE_FIRST, TYPE_SECOND } from '~/const/exchangeType';
+import { TYPE_FIRST, TYPE_SECOND } from "~/const/exchangeType";
 
-import CurrencySelect from '~/components/CurrencySelect.vue';
+import CurrencySelect from "~/components/CurrencySelect.vue";
 
 const store = useStore();
 const toast = createToaster();
@@ -61,7 +62,7 @@ const currencySecond = computed(() => store.getters.currencySecond);
 const rate = computed(() => store.getters.rate);
 
 const onCurrencyChange = (type, name, value) => {
-  store.commit('setCurrency', {
+  store.commit("setCurrency", {
     type,
     name,
   });
@@ -69,17 +70,18 @@ const onCurrencyChange = (type, name, value) => {
 };
 
 const onChange = (type, value) => {
-  store.dispatch('convert', {
-    type,
-    value,
-  })
-  .catch((e) => {
-    if (e?.response?.data) {
-      toast.error(e.response.data.message, {
-        position: 'top-right'
-      });
-    }
-  })
+  store
+    .dispatch("convert", {
+      type,
+      value,
+    })
+    .catch((e) => {
+      if (e?.response?.data) {
+        toast.error(e.response.data.message, {
+          position: "top-right",
+        });
+      }
+    });
 };
 </script>
 
