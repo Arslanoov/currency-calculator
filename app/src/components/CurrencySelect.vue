@@ -2,17 +2,16 @@
   <v-select
     @update:modelValue="onCurrencyChange"
     :modelValue="value"
-    :options="Object.values(CURRENCIES_LIST)"
-    :reduce="(currency) => currency.title"
+    :options="CURRENCIES_LIST"
     class="select"
-    label="title"
+    label="label"
   >
     <template #option="option">
       <div class="select__row">
         <div class="select__left">
-          <img class="select__image" :src="`/icons/${option.title}.png`" alt="" />
+          <img class="select__image" :src="`/icons/${option.label}.png`" alt="" />
         </div>
-        <div class="select__title">{{ option.title.toUpperCase() }}</div>
+        <div class="select__title">{{ option.label.toUpperCase() }}</div>
       </div>
     </template>
   </v-select>

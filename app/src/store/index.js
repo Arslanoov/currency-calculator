@@ -11,33 +11,24 @@ export const store = createStore({
     return {
       currencyFirst: CURRENCY_BTC,
       currencySecond: CURRENCY_USD,
-      valueFirst: 3,
+      valueFirst: 0,
       valueSecond: 0,
       lastType: TYPE_FIRST,
       rate: null,
+      cached: {},
     }
   },
   mutations: {
     setValue(state, payload) {
-      if (state.lastType === TYPE_FIRST) {
-        state.valueFirst = payload;
-      } else {
-        state.valueSecond = payload;
-      }
+      const value = Math.max(0, payload);
+      state.lastType === TYPE_FIRST ? state.valueFirst = value : state.valueSecond = value;
     },
     setConvertedValue(state, payload) {
-      if (state.lastType === TYPE_FIRST) {
-        state.valueSecond = payload;
-      } else {
-        state.valueFirst = payload;
-      }
+      const value = Math.max(0, payload);
+      state.lastType === TYPE_FIRST ? state.valueSecond = value : state.valueFirst = value;
     },
     setCurrency(state, payload) {
-      if (payload.type === TYPE_FIRST) {
-        state.currencyFirst = payload.name;
-      } else {
-        state.currencySecond = payload.name;
-      }
+      payload.type === TYPE_FIRST ? state.currencyFirst = payload.name : state.currencySecond = payload.name;
     },
     setLastType(state, payload) {
       state.lastType = payload;
@@ -45,15 +36,28 @@ export const store = createStore({
     setRate(state, payload) {
       state.rate = payload;
     },
+    addCachedRate(state, payload) {
+      state.cached[payload.key] = payload.value;
+    },
   },
   actions: {
     async convert({ commit, getters }, { type, value }) {
       commit('setLastType', type);
       commit('setValue', value);
 
-      const { data: { data: { conversion_rate: rate } } } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
+      let rate;
+      if (getters.cached[`${getters.currencyFrom}-${getters.currencyTo}`]) {
+        rate = getters.cached[`${getters.currencyFrom}-${getters.currencyTo}`];
+      } else {
+        const { data } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
+        rate = data.data.conversion_rate;
+        commit('addCachedRate', {
+          key: `${getters.currencyFrom}-${getters.currencyTo}`,
+          value: rate,
+        })
+      }
 
-      const convertedValue = Number((getters.valueFrom * rate * COMMISSION).toFixed(6));
+      const convertedValue = getters.valueFrom * rate * COMMISSION;
 
       commit('setConvertedValue', convertedValue);
       commit('setRate', rate);
@@ -65,6 +69,7 @@ export const store = createStore({
     valueFirst: (state) => state.valueFirst,
     valueSecond: (state) => state.valueSecond,
     rate: (state) => state.rate,
+    cached: (state) => state.cached,
     currencyFrom: (state) => state.lastType === TYPE_FIRST ? state.currencyFirst : state.currencySecond,
     currencyTo: (state) => state.lastType === TYPE_FIRST ? state.currencySecond : state.currencyFirst,
     valueFrom: (state) => state.lastType === TYPE_FIRST ? state.valueFirst : state.valueSecond,

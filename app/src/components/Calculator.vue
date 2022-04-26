@@ -5,14 +5,16 @@
 
       <div class="calculator-form__row">
         <CurrencySelect
-          @change="name => onCurrencyChange(TYPE_FIRST, name)"
+          @change="name => onCurrencyChange(TYPE_FIRST, name, valueFirst)"
           :value="currencyFirst"
         />
         <input
           @input="onChange(TYPE_FIRST, $event.target.value)"
           :value="valueFirst" name="from"
           class="calculator-form__input"
-          type="text"
+          id="from"
+          type="number"
+          min="0"
         >
       </div>
     </div>
@@ -26,16 +28,17 @@
           :value="currencySecond"
         />
         <input
-          @input="onChange(TYPE_SECOND, $event.target.value)"
+          @input="onChange(TYPE_SECOND, $event.target.value, valueSecond)"
           :value="valueSecond"
-          name="to"
+          id="to"
           class="calculator-form__input"
-          type="text"
+          type="number"
+          min="0"
         >
       </div>
     </div>
 
-    <div v-if="rate" class="calculator-form__rate">Rate: {{ rate }}</div>
+    <div class="calculator-form__rate">Rate: {{ rate }}</div>
   </form>
 </template>
 
@@ -57,10 +60,13 @@ const currencyFirst = computed(() => store.getters.currencyFirst);
 const currencySecond = computed(() => store.getters.currencySecond);
 const rate = computed(() => store.getters.rate);
 
-const onCurrencyChange = (type, name) => store.commit('setCurrency', {
-  type,
-  name,
-});
+const onCurrencyChange = (type, name, value) => {
+  store.commit('setCurrency', {
+    type,
+    name,
+  });
+  onChange(type, value);
+};
 
 const onChange = (type, value) => {
   store.dispatch('convert', {
