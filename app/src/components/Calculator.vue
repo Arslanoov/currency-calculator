@@ -42,12 +42,14 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { createToaster } from '@meforma/vue-toaster';
 
 import { TYPE_FIRST, TYPE_SECOND } from '~/const/exchangeType';
 
 import CurrencySelect from '~/components/CurrencySelect.vue';
 
 const store = useStore();
+const toast = createToaster();
 
 const valueFirst = computed(() => store.getters.valueFirst);
 const valueSecond = computed(() => store.getters.valueSecond);
@@ -60,10 +62,19 @@ const onCurrencyChange = (type, name) => store.commit('setCurrency', {
   name,
 });
 
-const onChange = (type, value) => store.dispatch('convert', {
-  type,
-  value,
-});
+const onChange = (type, value) => {
+  store.dispatch('convert', {
+    type,
+    value,
+  })
+  .catch((e) => {
+    if (e?.response?.data) {
+      toast.error(e.response.data.message, {
+        position: 'top-right'
+      });
+    }
+  })
+};
 </script>
 
 <style lang="scss" scoped>

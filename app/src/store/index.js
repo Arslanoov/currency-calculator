@@ -48,21 +48,15 @@ export const store = createStore({
   },
   actions: {
     async convert({ commit, getters }, { type, value }) {
-      try {
-        commit('setLastType', type);
-        commit('setValue', value);
+      commit('setLastType', type);
+      commit('setValue', value);
 
-        const { data: { data: { conversion_rate: rate } } } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
+      const { data: { data: { conversion_rate: rate } } } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
 
-        const convertedValue = Number((getters.valueFrom * rate * COMMISSION).toFixed(6));
+      const convertedValue = Number((getters.valueFrom * rate * COMMISSION).toFixed(6));
 
-        commit('setConvertedValue', convertedValue);
-        commit('setRate', rate);
-      } catch (e) {
-        if (e?.response?.data) {
-          console.log(e.response.data.message);
-        }
-      }
+      commit('setConvertedValue', convertedValue);
+      commit('setRate', rate);
     }
   },
   getters: {
