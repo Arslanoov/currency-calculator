@@ -1,4 +1,4 @@
-export const CURRENCY_BTC = 'BTC';
-export const CURRENCY_ETH = 'ETH';
-export const CURRENCY_USD = 'USD';
-export const CURRENCY_EUR = 'EUR';
+export const CURRENCY_BTC = 'btc';
+export const CURRENCY_ETH = 'eth';
+export const CURRENCY_USD = 'usd';
+export const CURRENCY_EUR = 'eur';

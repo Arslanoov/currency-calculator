@@ -1,1 +1,1 @@
-export const COMISSION = 1;
+export const COMMISSION = 1;
