@@ -7,9 +7,13 @@
 </template>
 
 <script setup>
-import Calculator from './components/calculator/Calculator.vue';
+import Calculator from './components/Calculator.vue';
 </script>
 
 <style>
 @import './assets/base.scss';
+
+.container {
+  font-size: 1.6rem;
+}
 </style>

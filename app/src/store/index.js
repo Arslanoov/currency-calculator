@@ -9,52 +9,69 @@ import { COMMISSION } from '@/const/comission';
 export const store = createStore({
   state () {
     return {
-      currencyFrom: CURRENCY_BTC,
-      currencyTo: CURRENCY_USD,
-      valueFrom: 3,
-      valueTo: 0,
+      currencyFirst: CURRENCY_BTC,
+      currencySecond: CURRENCY_USD,
+      valueFirst: 3,
+      valueSecond: 0,
+      lastType: TYPE_FIRST,
+      rate: null,
     }
   },
   mutations: {
-    setCurrencyFrom(state, payload) {
-      state.currencyFrom = payload;
+    setValue(state, payload) {
+      if (state.lastType === TYPE_FIRST) {
+        state.valueFirst = payload;
+      } else {
+        state.valueSecond = payload;
+      }
     },
-    setCurrencyTo(state, payload) {
-      state.currencyTo = payload;
+    setConvertedValue(state, payload) {
+      if (state.lastType === TYPE_FIRST) {
+        state.valueSecond = payload;
+      } else {
+        state.valueFirst = payload;
+      }
     },
-    setValueFrom(state, payload) {
-      state.valueFrom = payload;
+    setLastType(state, payload) {
+      state.lastType = payload;
     },
-    setValueTo(state, payload) {
-      state.valueTo = payload;
+    setRate(state, payload) {
+      state.rate = payload;
     },
   },
   actions: {
-    async convert({ commit, getters }, fromType) {
+    async convert({ commit, getters }, { type, value }) {
       try {
-        const { data } = await getExchangeRate(
-          fromType === TYPE_FIRST ? getters.currencyFrom : getters.currencyTo,
-          fromType === TYPE_FIRST ? getters.currencyTo : getters.currencyFrom
-        );
+        commit('setLastType', type);
+        commit('setValue', value);
 
-        if (!data.success) {
+        const {
+          data: {
+            data: { conversion_rate: rate },
+            success
+          }
+        } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
+
+        if (!success) {
           throw new Error('Exchange error');
         }
 
-        const sumFrom = fromType === TYPE_FIRST ? getters.valueFrom : getters.valueTo;
-
-        const convertedSum = sumFrom * data.data.conversion_rate * ((100 - COMMISSION) / 100);
-
-        commit(fromType === TYPE_FIRST ? 'setCurrencyFrom' : 'setCurrencyTo', convertedSum);
+        commit('setRate', rate);
+        commit('setConvertedValue', getters.valueFrom * rate * COMMISSION);
       } catch (e) {
         console.log('e', e);
       }
     }
   },
   getters: {
-    currencyFrom: (state) => state.currencyFrom,
-    currencyTo: (state) => state.currencyTo,
-    valueFrom: (state) => state.valueFrom,
-    valueTo: (state) => state.valueTo,
+    currencyFirst: (state) => state.currencyFirst,
+    currencySecond: (state) => state.currencySecond,
+    valueFirst: (state) => state.valueFirst,
+    valueSecond: (state) => state.valueSecond,
+    rate: (state) => state.rate,
+    currencyFrom: (state) => state.lastType === TYPE_FIRST ? state.currencyFirst : state.currencySecond,
+    currencyTo: (state) => state.lastType === TYPE_FIRST ? state.currencySecond : state.currencyFirst,
+    valueFrom: (state) => state.lastType === TYPE_FIRST ? state.valueFirst : state.valueSecond,
+    valueTo: (state) => state.lastType === TYPE_FIRST ? state.valueSecond : state.valueFirst,
   }
 });
