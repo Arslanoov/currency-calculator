@@ -2,12 +2,37 @@
   <form class="calculator-form">
     <div class="calculator-form__group">
       <label class="calculator-form__label" for="from">Amount I have</label>
-      <input class="calculator-form__input" @input="onFirstChange" :value="valueFirst" name="from" type="text">
+
+      <div class="calculator-form__row">
+        <CurrencySelect
+          @change="name => onCurrencyChange(TYPE_FIRST, name)"
+          :value="currencyFirst"
+        />
+        <input
+          @input="onChange(TYPE_FIRST, $event.target.value)"
+          :value="valueFirst" name="from"
+          class="calculator-form__input"
+          type="text"
+        >
+      </div>
     </div>
 
     <div class="calculator-form__group">
       <label class="calculator-form__label" for="to">I need</label>
-      <input class="calculator-form__input" @input="onSecondChange" :value="valueSecond" name="to" type="text">
+
+      <div class="calculator-form__row">
+        <CurrencySelect
+          @change="name => onCurrencyChange(TYPE_SECOND, name)"
+          :value="currencySecond"
+        />
+        <input
+          @input="onChange(TYPE_SECOND, $event.target.value)"
+          :value="valueSecond"
+          name="to"
+          class="calculator-form__input"
+          type="text"
+        >
+      </div>
     </div>
 
     <div v-if="rate" class="calculator-form__rate">Rate: {{ rate }}</div>
@@ -18,24 +43,56 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 
-import { TYPE_FIRST, TYPE_SECOND } from '@/const/exchangeType';
+import { TYPE_FIRST, TYPE_SECOND } from '~/const/exchangeType';
+
+import CurrencySelect from '~/components/CurrencySelect.vue';
 
 const store = useStore();
 
 const valueFirst = computed(() => store.getters.valueFirst);
 const valueSecond = computed(() => store.getters.valueSecond);
+const currencyFirst = computed(() => store.getters.currencyFirst);
+const currencySecond = computed(() => store.getters.currencySecond);
 const rate = computed(() => store.getters.rate);
 
-const onFirstChange = (e) => store.dispatch('convert', {
-  type: TYPE_FIRST,
-  value: e.target.value
+const onCurrencyChange = (type, name) => store.commit('setCurrency', {
+  type,
+  name,
 });
-const onSecondChange = (e) => store.dispatch('convert', {
-  type: TYPE_SECOND,
-  value: e.target.value
+
+const onChange = (type, value) => store.dispatch('convert', {
+  type,
+  value,
 });
 </script>
 
 <style lang="scss" scoped>
+.calculator-form {
+  &__row {
+    display: flex;
+    align-items: center;
 
+    gap: 2rem;
+  }
+
+  &__group {
+    &:not(:last-of-type) {
+      margin-bottom: 2rem;
+    }
+  }
+
+  &__label {
+    font-size: 1.8rem;
+    font-weight: 500;
+  }
+
+  &__input {
+    min-width: 5rem;
+    height: 3.3rem;
+
+    text-align: center;
+
+    font-size: 1.6rem;
+  }
+}
 </style>

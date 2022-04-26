@@ -11,9 +11,11 @@ import Calculator from './components/Calculator.vue';
 </script>
 
 <style>
-@import './assets/base.scss';
+@import 'assets/styles/base.scss';
 
 .container {
+  padding: 2rem;
+
   font-size: 1.6rem;
 }
 </style>

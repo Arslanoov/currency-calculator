@@ -1,10 +1,10 @@
 import { createStore } from 'vuex';
 
-import { getExchangeRate } from '@/api';
+import { getExchangeRate } from '~/api';
 
-import { CURRENCY_BTC, CURRENCY_USD } from '@/const/currency';
-import { TYPE_FIRST } from '@/const/exchangeType';
-import { COMMISSION } from '@/const/comission';
+import { CURRENCY_BTC, CURRENCY_USD } from '~/const/currency';
+import { TYPE_FIRST } from '~/const/exchangeType';
+import { COMMISSION } from '~/const/comission';
 
 export const store = createStore({
   state () {
@@ -32,6 +32,13 @@ export const store = createStore({
         state.valueFirst = payload;
       }
     },
+    setCurrency(state, payload) {
+      if (payload.type === TYPE_FIRST) {
+        state.currencyFirst = payload.name;
+      } else {
+        state.currencySecond = payload.name;
+      }
+    },
     setLastType(state, payload) {
       state.lastType = payload;
     },
@@ -45,21 +52,16 @@ export const store = createStore({
         commit('setLastType', type);
         commit('setValue', value);
 
-        const {
-          data: {
-            data: { conversion_rate: rate },
-            success
-          }
-        } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
+        const { data: { data: { conversion_rate: rate } } } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
 
-        if (!success) {
-          throw new Error('Exchange error');
-        }
+        const convertedValue = Number((getters.valueFrom * rate * COMMISSION).toFixed(6));
 
+        commit('setConvertedValue', convertedValue);
         commit('setRate', rate);
-        commit('setConvertedValue', getters.valueFrom * rate * COMMISSION);
       } catch (e) {
-        console.log('e', e);
+        if (e?.response?.data) {
+          console.log(e.response.data.message);
+        }
       }
     }
   },
