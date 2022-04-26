@@ -45,14 +45,15 @@ export const store = createStore({
       commit('setLastType', type);
       commit('setValue', value);
 
+      const currentExchange = `${getters.currencyFrom}-${getters.currencyTo}`;
       let rate;
-      if (getters.cached[`${getters.currencyFrom}-${getters.currencyTo}`]) {
-        rate = getters.cached[`${getters.currencyFrom}-${getters.currencyTo}`];
+      if (getters.cached[currentExchange]) {
+        rate = getters.cached[currentExchange];
       } else {
         const { data } = await getExchangeRate(getters.currencyFrom, getters.currencyTo);
         rate = data.data.conversion_rate;
         commit('addCachedRate', {
-          key: `${getters.currencyFrom}-${getters.currencyTo}`,
+          key: currentExchange,
           value: rate,
         })
       }

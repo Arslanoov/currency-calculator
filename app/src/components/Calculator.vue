@@ -24,7 +24,7 @@
 
       <div class="calculator-form__row">
         <CurrencySelect
-          @change="name => onCurrencyChange(TYPE_SECOND, name)"
+          @change="name => onCurrencyChange(TYPE_SECOND, name, valueSecond)"
           :value="currencySecond"
         />
         <input
